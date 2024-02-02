@@ -60,7 +60,22 @@
         console.log("onclick1");
         screen.lockOrientation?.("landscape-primary");
         if (!scene) init();
+        wakelock();
       };
+
+      async function wakelock() {
+        // Create a reference for the Wake Lock.
+        let wakeLock = null;
+
+        // create an async function to request a wake lock
+        try {
+          wakeLock = await navigator.wakeLock.request("screen");
+          log({ wake: "Wake Lock is active!" });
+        } catch (err) {
+          // The Wake Lock request has failed - usually system related, such as battery.
+          log({ wake: `${err.name}, ${err.message}` });
+        }
+      }
 
       function init() {
         scene = new THREE.Scene();
