@@ -41,9 +41,13 @@
         context,
         themes = ["blackandwhite", "sepia", "arcade", "inverse"],
         currentTheme = 0,
+        enableTheme = false,
         lookingAtGround = false;
 
-      init();
+      document.body.onclick = () => {
+        console.log("onclick1");
+        init();
+      };
 
       function init() {
         scene = new THREE.Scene();
@@ -113,11 +117,18 @@
           });
         } else {
           navigator.mediaDevices
-            .getUserMedia({ video: { facingMode: "environment" } })
+            .getUserMedia({
+              video: {
+                facingMode: {
+                  ideal: "environment",
+                },
+              },
+            })
             .then(function (stream) {
               streamFound(stream);
             })
             .catch(function (err) {
+              console.log(err);
               alert(
                 "Sorry! We have had an error, please try on a different device. Error was: " +
                   err
@@ -127,7 +138,7 @@
 
         function streamFound(stream) {
           document.body.appendChild(video);
-          video.src = URL.createObjectURL(stream);
+          video.srcObject = stream;
           video.style.width = "100%";
           video.style.height = "100%";
           video.play();
@@ -176,7 +187,8 @@
         if (context) {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-          if (themes[currentTheme] == "blackandwhite") {
+          if (!enableTheme) {
+          } else if (themes[currentTheme] == "blackandwhite") {
             var imageData = context.getImageData(
               0,
               0,
