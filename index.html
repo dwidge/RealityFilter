@@ -55,8 +55,10 @@
         enableTheme = false,
         lookingAtGround = false;
 
+      screen.lockOrientation?.("landscape-primary");
       document.body.onclick = () => {
         console.log("onclick1");
+        screen.lockOrientation?.("landscape-primary");
         if (!scene) init();
       };
 
@@ -327,8 +329,9 @@
 
         renderer.setSize(width, height);
         effect.setSize(width, height);
+        const portrait = window.matchMedia("(orientation: portrait)").matches;
 
-        log({ width, height });
+        log({ width, height, portrait });
       }
 
       function update(dt) {
