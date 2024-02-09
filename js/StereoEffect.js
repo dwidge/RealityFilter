@@ -9,8 +9,8 @@
 
 THREE.StereoEffect = function (renderer) {
   // API
-
-  this.separation = 3;
+  this.offset = 0;
+  this.separation = 0;
 
   /*
    * Distance to the non-parallax or projection plane
@@ -107,10 +107,10 @@ THREE.StereoEffect = function (renderer) {
     renderer.setViewport(0, 0, _width * 2, _height);
     renderer.clear();
 
-    renderer.setViewport(0, 0, _width, _height);
+    renderer.setViewport(0 + this.offset, 0, _width, _height);
     renderer.render(scene, _cameraL);
 
-    renderer.setViewport(_width, 0, _width, _height);
+    renderer.setViewport(_width + this.offset, 0, _width, _height);
     renderer.render(scene, _cameraR);
   };
 };
