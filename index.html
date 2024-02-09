@@ -39,6 +39,8 @@
     <script src="./js/three.min.js"></script>
     <script src="./js/StereoEffect.js"></script>
     <script src="./js/close-pixelate-canvas.js"></script>
+    <script src="./js/log.js"></script>
+    <script src="./js/slideTouch.js"></script>
 
     <script>
       var scene,
@@ -92,6 +94,21 @@
         element = renderer.domElement;
         container = document.getElementById("webglviewer");
         container.appendChild(element);
+        setupSlideTouch(container, (currentDiff, startDiff, touchCount) => {
+          if (touchCount === 1) {
+            effect.separation += currentDiff[0] * 20;
+            camera.fov += currentDiff[1] * 20;
+          }
+          if (touchCount === 2) {
+            effect.offset += currentDiff[0] * 20;
+          }
+
+          log({
+            offset: effect.offset.toFixed(2),
+            separation: effect.separation.toFixed(2),
+            focalLength: camera.fov.toFixed(2),
+          });
+        });
 
         effect = new THREE.StereoEffect(renderer);
 
@@ -369,13 +386,6 @@
         } else if (container.webkitRequestFullscreen) {
           container.webkitRequestFullscreen();
         }
-      }
-
-      let logs = {};
-      function log(m = {}) {
-        logs = { ...logs, ...m };
-        const msgs = Object.entries(logs).map((m) => m[0] + " " + m[1]);
-        logDiv.innerHTML = msgs.join?.("<br/>");
       }
     </script>
   </body>
