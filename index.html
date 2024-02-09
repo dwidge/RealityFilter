@@ -8,9 +8,11 @@
       content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
     <style>
+      html,
       body {
         margin: 0px;
         overflow: hidden;
+        height: 100%;
       }
       #webglviewer {
         bottom: 0;
@@ -40,6 +42,7 @@
     <script src="./js/StereoEffect.js"></script>
     <script src="./js/close-pixelate-canvas.js"></script>
     <script src="./js/log.js"></script>
+    <script src="./js/localstorage.js"></script>
     <script src="./js/slideTouch.js"></script>
 
     <script>
@@ -56,6 +59,7 @@
         currentTheme = 0,
         enableTheme = false,
         lookingAtGround = false;
+      const settingsKey = "reality.5";
 
       screen.lockOrientation?.("landscape-primary");
       document.body.onclick = () => {
@@ -79,6 +83,21 @@
         }
       }
 
+      function setsettings(settings) {
+        effect.separation = settings.separation;
+        camera.fov = settings.fov;
+        effect.offset = settings.offset;
+      }
+      function getsettings() {
+        const s = {
+          offset: effect.offset,
+          separation: effect.separation,
+          fov: camera.fov,
+        };
+        console.log(s);
+        return s;
+      }
+
       function init() {
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(
@@ -95,22 +114,25 @@
         container = document.getElementById("webglviewer");
         container.appendChild(element);
         setupSlideTouch(container, (currentDiff, startDiff, touchCount) => {
+          const settings = getsettings();
+
           if (touchCount === 1) {
-            effect.separation += currentDiff[0] * 20;
-            camera.fov += currentDiff[1] * 20;
+            settings.separation += currentDiff[0] * 20;
+            settings.fov += currentDiff[1] * 20;
           }
           if (touchCount === 2) {
-            effect.offset += currentDiff[0] * 20;
+            settings.offset += currentDiff[0] * 20;
           }
 
-          log({
-            offset: effect.offset.toFixed(2),
-            separation: effect.separation.toFixed(2),
-            focalLength: camera.fov.toFixed(2),
-          });
+          setsettings(settings);
+          save(settingsKey, settings);
+          log(settings);
         });
 
         effect = new THREE.StereoEffect(renderer);
+
+        const settings = load(settingsKey);
+        if (settings) setsettings(settings);
 
         element.addEventListener("click", fullscreen, false);
 
